@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weeks Countdown Widget</title>
+  <link href="https://fonts.googleapis.com/css2?family=Puvi&display=swap" rel="stylesheet">
+  <style>
+    .countdown-widget {
+      font-family: 'Puvi', sans-serif;
+      background-color: #000;
+      color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 280px;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #ccc;
+    }
+
+    .weeks {
+      font-size: 3rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .datetime {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    .clock {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #fff;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body style="background: #111; display: flex; justify-content: center; align-items: center; height: 100vh;">
+
+  <div class="countdown-widget">
+    <div class="title">Weeks Until Sep 16, 2025</div>
+    <div class="weeks" id="weeksCountdown">--</div>
+
+    <div class="datetime">
+      <div id="currentDate">--</div>
+      <div class="clock" id="clock">--:--:--</div>
+    </div>
+  </div>
+
+  <script>
+    const timeZone = 'America/New_York';
+
+    function getWeeksRemaining(fromDate, toDate) {
+      const msPerWeek = 1000 * 60 * 60 * 24 * 7;
+      const diff = toDate.setHours(0, 0, 0, 0) - fromDate.setHours(0, 0, 0, 0);
+      return Math.max(0, Math.ceil(diff / msPerWeek));
+    }
+
+    function updateWeeksCountdown() {
+      const now = new Date();
+      const targetDate = new Date('2025-09-16');
+      const weeksLeft = getWeeksRemaining(now, targetDate);
+      document.getElementById('weeksCountdown').textContent = weeksLeft;
+    }
+
+    function updateClockAndDate() {
+      const now = new Date();
+
+      const dateFormatter = new Intl.DateTimeFormat('en-US', {
+        timeZone,
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const timeFormatter = new Intl.DateTimeFormat('en-US', {
+        timeZone,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+
+      document.getElementById('currentDate').textContent = dateFormatter.format(now);
+      document.getElementById('clock').textContent = timeFormatter.format(now);
+    }
+
+    function scheduleMidnightUpdate() {
+      const now = new Date();
+      const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
+      setTimeout(() => {
+        updateWeeksCountdown();
+        updateClockAndDate();
+        scheduleMidnightUpdate();
+      }, msUntilMidnight + 1000);
+    }
+
+    updateWeeksCountdown();
+    updateClockAndDate();
+    scheduleMidnightUpdate();
+    setInterval(updateClockAndDate, 1000);
+  </script>
+</body>
+</html>
